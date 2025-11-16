@@ -54,7 +54,7 @@ resource "azurerm_app_service_plan" "asp" {
   }
 
   tags = {
-    Terraform = "true"
+    origin = "Terraform"
   }
 }
 
