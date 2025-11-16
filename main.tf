@@ -17,7 +17,7 @@ resource "azurerm_resource_group" "rg" {
   location = "West US 3"
 
   tags = {
-    Terraform = "true"
+    origin = "Terraform"
   }
 }
 
@@ -29,7 +29,7 @@ resource "azurerm_virtual_network" "vnet" {
   address_space       = ["10.0.0.0/16"]
 
   tags = {
-    Terraform = "true"
+    origin = "Terraform"
   }
 }
 
@@ -75,7 +75,7 @@ resource "azurerm_windows_web_app" "webapp" {
   }
 
   tags = {
-    Terraform = "true"
+    origin = "Terraform"
   }
 }
 
@@ -89,7 +89,7 @@ resource "azurerm_mssql_server" "sqlserver" {
   administrator_login_password = "P@ssword1234!"
 
   tags = {
-    Terraform = "true"
+    origin = "Terraform"
   }
 }
 
@@ -100,7 +100,7 @@ resource "azurerm_mssql_database" "sqldb" {
   sku_name       = "Basic"
 
   tags = {
-    Terraform = "true"
+    origin = "Terraform"
   }
 }
 
@@ -110,7 +110,7 @@ resource "azurerm_private_dns_zone" "sql_dns" {
   resource_group_name = azurerm_resource_group.rg.name
 
   tags = {
-    Terraform = "true"
+    origin = "Terraform"
   }
 }
 
@@ -137,7 +137,7 @@ resource "azurerm_private_endpoint" "sql_private_endpoint" {
   }
 
   tags = {
-    Terraform = "true"
+    origin = "Terraform"
   }
 }
 
