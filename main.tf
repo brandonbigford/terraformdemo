@@ -33,16 +33,12 @@ resource "azurerm_virtual_network" "vnet" {
   }
 }
 
-# Subnet for Private Endpoint
+# Subnet for Private Endpoint (no tags supported)
 resource "azurerm_subnet" "private_subnet" {
   name                 = "private-endpoint-subnet"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
-
-  tags = {
-    Terraform = "true"
-  }
 }
 
 # App Service Plan (Windows)
@@ -118,16 +114,12 @@ resource "azurerm_private_dns_zone" "sql_dns" {
   }
 }
 
-# Virtual Network Link to DNS Zone
+# Virtual Network Link to DNS Zone (no tags supported)
 resource "azurerm_private_dns_zone_virtual_network_link" "dns_link" {
   name                  = "dns-link"
   resource_group_name   = azurerm_resource_group.rg.name
   private_dns_zone_name = azurerm_private_dns_zone.sql_dns.name
   virtual_network_id    = azurerm_virtual_network.vnet.id
-
-  tags = {
-    Terraform = "true"
-  }
 }
 
 # Private Endpoint for SQL Server
@@ -149,15 +141,11 @@ resource "azurerm_private_endpoint" "sql_private_endpoint" {
   }
 }
 
-# DNS A Record for SQL Server Private Endpoint
+# DNS A Record for SQL Server Private Endpoint (no tags supported)
 resource "azurerm_private_dns_a_record" "sql_dns_record" {
   name                = azurerm_mssql_server.sqlserver.name
   zone_name           = azurerm_private_dns_zone.sql_dns.name
   resource_group_name = azurerm_resource_group.rg.name
   ttl                 = 300
   records             = [azurerm_private_endpoint.sql_private_endpoint.private_service_connection[0].private_ip_address]
-
-  tags = {
-    Terraform = "true"
-  }
 }
