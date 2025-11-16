@@ -15,6 +15,10 @@ provider "azurerm" {
 resource "azurerm_resource_group" "rg" {
   name     = "appservice-sql-rg"
   location = "West US 3"
+
+  tags = {
+    Terraform = "true"
+  }
 }
 
 # Virtual Network
@@ -23,6 +27,10 @@ resource "azurerm_virtual_network" "vnet" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   address_space       = ["10.0.0.0/16"]
+
+  tags = {
+    Terraform = "true"
+  }
 }
 
 # Subnet for Private Endpoint
@@ -31,6 +39,10 @@ resource "azurerm_subnet" "private_subnet" {
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
+
+  tags = {
+    Terraform = "true"
+  }
 }
 
 # App Service Plan (Windows)
@@ -43,6 +55,10 @@ resource "azurerm_app_service_plan" "asp" {
   sku {
     tier = "Basic"
     size = "B1"
+  }
+
+  tags = {
+    Terraform = "true"
   }
 }
 
@@ -61,6 +77,10 @@ resource "azurerm_windows_web_app" "webapp" {
   app_settings = {
     "WEBSITE_NODE_DEFAULT_VERSION" = "~14"
   }
+
+  tags = {
+    Terraform = "true"
+  }
 }
 
 # SQL Server
@@ -71,6 +91,10 @@ resource "azurerm_mssql_server" "sqlserver" {
   version                      = "12.0"
   administrator_login          = "sqladminuser"
   administrator_login_password = "P@ssword1234!"
+
+  tags = {
+    Terraform = "true"
+  }
 }
 
 # SQL Database
@@ -78,12 +102,20 @@ resource "azurerm_mssql_database" "sqldb" {
   name           = "sqldbdemo"
   server_id      = azurerm_mssql_server.sqlserver.id
   sku_name       = "Basic"
+
+  tags = {
+    Terraform = "true"
+  }
 }
 
 # Private DNS Zone for SQL Database
 resource "azurerm_private_dns_zone" "sql_dns" {
   name                = "privatelink.database.windows.net"
   resource_group_name = azurerm_resource_group.rg.name
+
+  tags = {
+    Terraform = "true"
+  }
 }
 
 # Virtual Network Link to DNS Zone
@@ -92,6 +124,10 @@ resource "azurerm_private_dns_zone_virtual_network_link" "dns_link" {
   resource_group_name   = azurerm_resource_group.rg.name
   private_dns_zone_name = azurerm_private_dns_zone.sql_dns.name
   virtual_network_id    = azurerm_virtual_network.vnet.id
+
+  tags = {
+    Terraform = "true"
+  }
 }
 
 # Private Endpoint for SQL Server
@@ -107,6 +143,10 @@ resource "azurerm_private_endpoint" "sql_private_endpoint" {
     subresource_names              = ["sqlServer"]
     is_manual_connection           = false
   }
+
+  tags = {
+    Terraform = "true"
+  }
 }
 
 # DNS A Record for SQL Server Private Endpoint
@@ -116,4 +156,8 @@ resource "azurerm_private_dns_a_record" "sql_dns_record" {
   resource_group_name = azurerm_resource_group.rg.name
   ttl                 = 300
   records             = [azurerm_private_endpoint.sql_private_endpoint.private_service_connection[0].private_ip_address]
+
+  tags = {
+    Terraform = "true"
+  }
 }
