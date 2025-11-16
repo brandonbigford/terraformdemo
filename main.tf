@@ -13,8 +13,24 @@ provider "azurerm" {
 
 # Resource Group
 resource "azurerm_resource_group" "rg" {
-  name     = "rg-appservice-sql"
-  location = "East US"
+  name     = "appservice-sql-rg"
+  location = "West US 3"
+}
+
+# Virtual Network
+resource "azurerm_virtual_network" "vnet" {
+  name                = "vnet-appservice-sql"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  address_space       = ["10.0.0.0/16"]
+}
+
+# Subnet for Private Endpoint
+resource "azurerm_subnet" "private_subnet" {
+  name                 = "private-endpoint-subnet"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
 }
 
 # App Service Plan (Windows)
@@ -25,8 +41,8 @@ resource "azurerm_app_service_plan" "asp" {
   kind                = "Windows"
 
   sku {
-    tier = "Standard"
-    size = "S1"
+    tier = "Basic"
+    size = "B1"
   }
 }
 
@@ -61,5 +77,43 @@ resource "azurerm_mssql_server" "sqlserver" {
 resource "azurerm_mssql_database" "sqldb" {
   name           = "sqldbdemo"
   server_id      = azurerm_mssql_server.sqlserver.id
-  sku_name       = "S0"
+  sku_name       = "Basic"
+}
+
+# Private DNS Zone for SQL Database
+resource "azurerm_private_dns_zone" "sql_dns" {
+  name                = "privatelink.database.windows.net"
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+# Virtual Network Link to DNS Zone
+resource "azurerm_private_dns_zone_virtual_network_link" "dns_link" {
+  name                  = "dns-link"
+  resource_group_name   = azurerm_resource_group.rg.name
+  private_dns_zone_name = azurerm_private_dns_zone.sql_dns.name
+  virtual_network_id    = azurerm_virtual_network.vnet.id
+}
+
+# Private Endpoint for SQL Server
+resource "azurerm_private_endpoint" "sql_private_endpoint" {
+  name                = "sql-private-endpoint"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  subnet_id           = azurerm_subnet.private_subnet.id
+
+  private_service_connection {
+    name                           = "sql-priv-connection"
+    private_connection_resource_id = azurerm_mssql_server.sqlserver.id
+    subresource_names              = ["sqlServer"]
+    is_manual_connection           = false
+  }
+}
+
+# DNS A Record for SQL Server Private Endpoint
+resource "azurerm_private_dns_a_record" "sql_dns_record" {
+  name                = azurerm_mssql_server.sqlserver.name
+  zone_name           = azurerm_private_dns_zone.sql_dns.name
+  resource_group_name = azurerm_resource_group.rg.name
+  ttl                 = 300
+  records             = [azurerm_private_endpoint.sql_private_endpoint.private_service_connection[0].private_ip_address]
 }
