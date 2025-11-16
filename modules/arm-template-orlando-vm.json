@@ -9,7 +9,7 @@
       "name": "orlandoArmVnet",
       "location": "westus3",
       "tags": {
-        "ARM": "true"
+        "origin": "ARM"
       },
       "properties": {
         "addressSpace": {
@@ -33,7 +33,7 @@
       "name": "orlandoArmNSG",
       "location": "westus3",
       "tags": {
-        "ARM": "true"
+        "origin": "ARM"
       },
       "properties": {
         "securityRules": [
@@ -59,7 +59,7 @@
       "name": "orlandoArmPublicIP",
       "location": "westus3",
       "tags": {
-        "ARM": "true"
+        "origin": "ARM"
       },
       "properties": {
         "publicIPAllocationMethod": "Dynamic"
@@ -71,7 +71,7 @@
       "name": "orlandoArmNIC",
       "location": "westus3",
       "tags": {
-        "ARM": "true"
+        "origin": "ARM"
       },
       "dependsOn": [
         "Microsoft.Network/virtualNetworks/orlandoArmVnet",
@@ -100,7 +100,7 @@
       "name": "orlandoArmVM",
       "location": "westus3",
       "tags": {
-        "ARM": "true"
+        "origin": "ARM"
       },
       "dependsOn": [
         "Microsoft.Network/networkInterfaces/orlandoArmNIC"
