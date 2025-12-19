@@ -6,7 +6,7 @@
     {
       "type": "Microsoft.Network/virtualNetworks",
       "apiVersion": "2022-09-01",
-      "name": "ICCUArmVnet",
+      "name": "TFDemoArmVnet",
       "location": "westus3",
       "tags": {
         "origin": "ARM"
@@ -19,7 +19,7 @@
         },
         "subnets": [
           {
-            "name": "ICCUArmSubnet",
+            "name": "TFDemoArmSubnet",
             "properties": {
               "addressPrefix": "10.0.0.0/24"
             }
@@ -30,7 +30,7 @@
     {
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2022-09-01",
-      "name": "ICCUArmNSG",
+      "name": "TFDemoArmNSG",
       "location": "westus3",
       "tags": {
         "origin": "ARM"
@@ -56,7 +56,7 @@
     {
       "type": "Microsoft.Network/publicIPAddresses",
       "apiVersion": "2022-09-01",
-      "name": "ICCUArmPublicIP",
+      "name": "TFDemoArmPublicIP",
       "location": "westus3",
       "tags": {
         "origin": "ARM"
@@ -68,14 +68,14 @@
     {
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2022-09-01",
-      "name": "ICCUArmNIC",
+      "name": "TFDemoArmNIC",
       "location": "westus3",
       "tags": {
         "origin": "ARM"
       },
       "dependsOn": [
-        "Microsoft.Network/virtualNetworks/ICCUArmVnet",
-        "Microsoft.Network/publicIPAddresses/ICCUArmPublicIP"
+        "Microsoft.Network/virtualNetworks/TFDemoArmVnet",
+        "Microsoft.Network/publicIPAddresses/TFDemoArmPublicIP"
       ],
       "properties": {
         "ipConfigurations": [
@@ -83,11 +83,11 @@
             "name": "ipconfig1",
             "properties": {
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'ICCUArmVnet', 'ICCUArmSubnet')]"
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'TFDemoArmVnet', 'TFDemoArmSubnet')]"
               },
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'ICCUArmPublicIP')]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'TFDemoArmPublicIP')]"
               }
             }
           }
@@ -97,21 +97,21 @@
     {
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2022-11-01",
-      "name": "ICCUArmVM",
+      "name": "TFDemoArmVM",
       "location": "westus3",
       "tags": {
         "origin": "ARM"
       },
       "dependsOn": [
-        "Microsoft.Network/networkInterfaces/ICCUArmNIC"
+        "Microsoft.Network/networkInterfaces/TFDemoArmNIC"
       ],
       "properties": {
         "hardwareProfile": {
           "vmSize": "Standard_B1s"
         },
         "osProfile": {
-          "computerName": "ICCUArmVM",
-          "adminUsername": "ICCUAdmin",
+          "computerName": "TFDemoArmVM",
+          "adminUsername": "TFDemoAdmin",
           "adminPassword": "P@ssword1234!"
         },
         "storageProfile": {
@@ -128,7 +128,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'ICCUArmNIC')]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'TFDemoArmNIC')]"
             }
           ]
         }

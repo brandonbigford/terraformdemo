@@ -4,8 +4,13 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
   }
 }
+
 
 provider "azurerm" {
   features {}
@@ -13,7 +18,7 @@ provider "azurerm" {
 
 # Resource Group
 resource "azurerm_resource_group" "rg" {
-  name     = "appservice-sql-rg"
+  name     = "terraform-demo-rg"
   location = "West US 3"
 
   tags = {
@@ -42,16 +47,12 @@ resource "azurerm_subnet" "private_subnet" {
 }
 
 # App Service Plan (Windows)
-resource "azurerm_app_service_plan" "asp" {
+resource "azurerm_service_plan" "asp" {
   name                = "asp-windows"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  kind                = "Windows"
-
-  sku {
-    tier = "Basic"
-    size = "B1"
-  }
+  os_type             = "Windows"
+  sku_name            = "B1"
 
   tags = {
     origin = "Terraform"
@@ -63,7 +64,7 @@ resource "azurerm_windows_web_app" "webapp" {
   name                = "iis-webapp-demo"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_app_service_plan.asp.id
+  service_plan_id     = azurerm_service_plan.asp.id
 
   site_config {
     always_on = true
@@ -79,13 +80,19 @@ resource "azurerm_windows_web_app" "webapp" {
   }
 }
 
+# Random suffix for SQL Server name
+resource "random_integer" "sql_suffix" {
+  min = 100
+  max = 999
+}
+
 # SQL Server
 resource "azurerm_mssql_server" "sqlserver" {
-  name                         = "sqlserverdemo123"
+  name                         = "sqlservertfdemo${random_integer.sql_suffix.result}"
   resource_group_name          = azurerm_resource_group.rg.name
   location                     = azurerm_resource_group.rg.location
   version                      = "12.0"
-  administrator_login          = "sqladminuser"
+   administrator_login          = "sqladminuser"
   administrator_login_password = "P@ssword1234!"
 
   tags = {
